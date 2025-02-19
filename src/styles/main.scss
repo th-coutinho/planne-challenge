@@ -1,5 +1,5 @@
 // styles.scss
-$primary-color: #3498db;
+$primary-color: #e3e3e3;
 @import './reset.scss';
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@600&display=swap');
@@ -22,9 +22,7 @@ body {
   justify-content: flex-start;
   text-align: left;
 
-  &__legend {
-
-  }
+  &__legend {}
 
   &__input {
     width: 480px;
@@ -33,6 +31,11 @@ body {
     border-width: 1px;
     border: 1px solid #616161;
     padding: 8px 12px;
+    border-radius: 8px;
+
+    &:focus {
+      border-color: #006EFF;
+    }
   }
 
   &__col {
@@ -56,19 +59,17 @@ body {
     list-style: none;
     display: flex;
     flex-direction: column;
-
-
-
-    // search-section__result-list__item
-    // search-section__results-list__item
+    border-radius: 8px;
+    box-shadow: 0px 12px 16px -4px #10182814;
+    border: 1px solid #8E8E8E;
 
     .highlight {
       color: #0092FF;
-
     }
 
     .focused {
       background-color: #E1F2FF;
+      outline: none !important;
     }
   }
 
@@ -85,7 +86,7 @@ body {
         position: absolute;
         right: 10px;
         top: 0;
-        bottom: 0;
+
         margin: auto;
         display: flex;
         align-items: center;
@@ -128,7 +129,7 @@ body {
     display: flex;
     gap: 10px;
     margin-top: 10px;
-    overflow: auto !important;
+    overflow: auto;
   }
 
   &__tag {

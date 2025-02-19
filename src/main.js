@@ -109,7 +109,6 @@ const setupArrowNavigationBehavior = () => {
     items[index].querySelector("img").src =
       items[index].querySelector("img").dataset.src;
 
-    debugger;
     items[index].focus();
 
     window.state = {
@@ -171,6 +170,10 @@ const searchMovies = async (e) => {
 const handleFavorite = (e) => {
   if (e.code !== "Space") return;
   if (!window.state.currentMovieId) return;
+
+  const input = document.getElementById("search");
+  if (document.activeElement === input) return;
+
   e.preventDefault();
 
   const movieId = window.state.currentMovieId;

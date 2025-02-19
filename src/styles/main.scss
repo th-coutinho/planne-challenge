@@ -1,0 +1,36 @@
+// styles.scss
+$primary-color: #3498db;
+
+body {
+  background-color: $primary-color;
+  font-family: Arial, sans-serif;
+}
+
+.search-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  text-align: left;
+
+  &__legend {
+
+  }
+
+  &__input {
+    width: 480px;
+    height: 40px;
+    min-height: 32px;
+    border-width: 1px;
+    border: 1px solid #616161;
+    padding: 8px 12px;
+  }
+
+  &__results-list {
+    width: 480px;
+    height: 344px;
+    padding: 10px;
+    background-color: white;
+    overflow: auto;
+    list-style: none;
+  }
+}

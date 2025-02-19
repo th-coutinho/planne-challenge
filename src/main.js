@@ -28,46 +28,47 @@ const fillMovieList = async (movies) => {
   const mappedMovies = mapMovies(movies);
 
   mappedMovies.forEach((movie) => {
-    const movieElement = document.createElement("li");
-
-    // Handle component props
-    movieElement.classList.add("search-section__results-list__item");
-    movieElement.setAttribute("tabindex", "-1");
-
-    // Handles and highlight the query in title
     const highlightedTitle = highlightSearchedQuery({
       query: window.state.searchQuery,
       title: movie.originalTitle,
     });
 
-    movieElement.innerHTML = highlightedTitle;
+    const template = `
+      <li
+        tabindex="-1"
+        class="search-section__item">
 
-    // moviesList.appendChild(movieElement);
+        <div class="search-section__col">
+          <img class="search-section__img" data-src="${
+            movie.posterSrc
+          }" alt="Movie Poster" loading="lazy"/>
+        </div>
 
-    // Create a container for genres
-    const genresContainer = document.createElement("span");
-    genresContainer.classList.add("genres-container");
+        <div class="search-section__col">
+          <div>
+            <h6 class="search-section__title">${highlightedTitle}</h6>
+            <date class="search-section__year">(${movie.releaseYear})</date>
+          </div>
 
-    // Assuming `movieGenres` is an array of genre IDs for this movie
-    movie.genres.forEach((genre) => {
-      const genreElement = document.createElement("span");
-      genreElement.classList.add("genre-tag");
-      genreElement.textContent = genre; // Convert genre ID to name
-      genresContainer.appendChild(genreElement);
-    });
+          <ul class="search-section__tags">
+            ${
+              movie.genres
+                .map((tag) => {
+                  return `<span class="search-section__tag">${tag}</span>`;
+                })
+                .join("") /* avoid commas to be rendered */
+            }
+          </ul>
+        </div>
+      </li>
+    `;
 
-    // // Append genres to the movie element
-    movieElement.appendChild(genresContainer);
+    // Convert string into real DOM nodes
+    const listItemElement = document
+      .createRange()
+      .createContextualFragment(template);
 
-    const imgElement = document.createElement("img");
-    imgElement.dataset.src = movie.posterSrc;
-    imgElement.alt = "Movie Poster";
-    imgElement.loading = "lazy";
-
-    movieElement.appendChild(imgElement);
-
-    // // Append movie element to the list
-    moviesList.appendChild(movieElement);
+    moviesList.appendChild(listItemElement);
   });
 };
 
@@ -89,7 +90,7 @@ document.querySelector("#app").innerHTML = `
     <input id='search' class='search-section__input' placeholder='Ex: Star Wars' type='search' />
     <span class='search-section__hint'>Utilize as teclas ↓ ↑ para navegar entre as opções</span>
 
-    <ul id='movies' class='search-section__results-list'></ul>
+    <ul id='movies' class='search-section__list'></ul>
 
   </section>
 `;

@@ -2,7 +2,10 @@ import "./style.css";
 import "./styles/main.scss";
 
 import { fetchSearchMovies } from "@api/request";
-import { mapByOriginalName } from "@utils/dataTransform";
+import {
+  mapByOriginalName,
+  highlightSearchedQuery,
+} from "@utils/dataTransform";
 /*
   {
     "adult": false,
@@ -28,8 +31,9 @@ const fillMovieList = (results) => {
 
   results.forEach((movie) => {
     const movieElement = document.createElement("li");
-    movieElement.classList.add("search-section__result-item");
-    movieElement.textContent = movie;
+    movieElement.classList.add("search-section__result-list__item");
+    movieElement.setAttribute("tabindex", "-1");
+    movieElement.innerHTML = movie;
     moviesList.appendChild(movieElement);
   });
 };
@@ -53,13 +57,47 @@ const setupSearch = () => {
   searchInput.addEventListener("blur", searchMovies);
 };
 
+const setupArrowNavigationBehavior = () => {
+  const list = document.getElementById("movies");
+  const items = Array.from(list.querySelectorAll("li"));
+
+  let currentIndex = 0;
+
+  function updateFocus(index) {
+    items.forEach((item) => item.classList.remove("focused"));
+    items[index].classList.add("focused");
+    items[index].focus();
+  }
+
+  list.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault(); // Prevent scrolling
+      currentIndex = (currentIndex + 1) % items.length; // Loop navigation
+      updateFocus(currentIndex);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      currentIndex = (currentIndex - 1 + items.length) % items.length;
+      updateFocus(currentIndex);
+    }
+  });
+
+  // Initialize first focus
+  updateFocus(currentIndex);
+};
+
 const searchMovies = async (e) => {
   const query = e.target.value;
   const response = await fetchSearchMovies(query);
   const movies = response.results;
+  debugger;
   const originalNames = mapByOriginalName(movies);
+  const highlightedMovies = highlightSearchedQuery({
+    query,
+    collection: originalNames,
+  });
 
-  fillMovieList(originalNames);
+  fillMovieList(highlightedMovies);
+  setupArrowNavigationBehavior();
 };
 
 setupSearch();

@@ -32,5 +32,18 @@ body {
     background-color: white;
     overflow: auto;
     list-style: none;
+
+    &-item {
+      font-weight: bold;
+    }
+
+    .highlight {
+      color: #0092FF;
+
+    }
+
+    .focused {
+      background-color: #E1F2FF;
+    }
   }
 }

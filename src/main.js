@@ -1,10 +1,8 @@
 import "./style.css";
-
-import TMDBClient from "tmdb-js";
 import "./styles/main.scss";
 
-const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-
+import { fetchSearchMovies } from "@api/request";
+import { mapByOriginalName } from "@utils/dataTransform";
 /*
   {
     "adult": false,
@@ -23,16 +21,6 @@ const apiKey = import.meta.env.VITE_TMDB_API_KEY;
     "vote_count": 48
   }
 */
-
-const search = async (e) => {
-  const query = e.target.value;
-  const tmdb = new TMDBClient(apiKey);
-
-  const request = await tmdb.search.getMovies({ query });
-  const mappedNames = request.results.map((m) => m.original_title);
-
-  fillMovieList(mappedNames);
-};
 
 const fillMovieList = (results) => {
   const moviesList = document.querySelector("#movies");
@@ -62,7 +50,16 @@ document.querySelector("#app").innerHTML = `
 
 const setupSearch = () => {
   const searchInput = document.querySelector("#search");
-  searchInput.addEventListener("blur", search);
+  searchInput.addEventListener("blur", searchMovies);
+};
+
+const searchMovies = async (e) => {
+  const query = e.target.value;
+  const response = await fetchSearchMovies(query);
+  const movies = response.results;
+  const originalNames = mapByOriginalName(movies);
+
+  fillMovieList(originalNames);
 };
 
 setupSearch();

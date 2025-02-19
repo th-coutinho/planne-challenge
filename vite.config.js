@@ -6,6 +6,7 @@ export default defineConfig({
     alias: {
       "@api": path.resolve(__dirname, "src/api"), // Alias '@api' -> '/src/api'
       "@utils": path.resolve(__dirname, "src/utils"),
+      "@mappers": path.resolve(__dirname, "src/mappers"),
     },
   },
 });

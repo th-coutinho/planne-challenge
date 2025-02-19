@@ -1,40 +1,52 @@
 import "./style.css";
 import "./styles/main.scss";
 
-import { fetchSearchMovies } from "@api/request";
+import { fetchSearchMovies, fetchMovieGenres } from "@api/request";
 import {
   mapByOriginalName,
   highlightSearchedQuery,
 } from "@utils/dataTransform";
+import { mapMovies } from "@mappers/movie";
+
+window.state = {
+  searchQuery: "",
+  movies: [],
+  genres: [],
+  currentPage: 1,
+  totalPages: 1,
+};
+
 /*
-  {
-    "adult": false,
-    "backdrop_path": null,
-    "genre_ids": [],
-    "id": 555879,
-    "original_language": "en",
-    "original_title": "Matrix",
-    "overview": "The film is composed of receding planes in a landscape: a back garden and the houses beyond. The wooden lattice fence, visible in the image, marks the border between enclosed and open, private and public space, and forms both a fulcrum for the work and a formal grid by which the shots are framed and organised.",
-    "popularity": 4.841,
-    "poster_path": "/AfFD10ZqEx2vkxM2yvRZkybsGB7.jpg",
-    "release_date": "1998-12-31",
-    "title": "Matrix",
-    "video": false,
-    "vote_average": 7.083,
-    "vote_count": 48
-  }
+  Why Use tabindex?
+  tabindex="0" → Makes the element focusable in natural tab order.
+  tabindex="-1" → Makes it focusable programmatically (not via keyboard Tab).
 */
 
-const fillMovieList = (results) => {
+const fillMovieList = async (movies) => {
   const moviesList = document.querySelector("#movies");
   moviesList.innerHTML = "";
+  const mappedMovies = mapMovies(movies);
 
-  results.forEach((movie) => {
+  mappedMovies.forEach((movie) => {
     const movieElement = document.createElement("li");
+    const highlightedTitle = highlightSearchedQuery({
+      query: window.state.searchQuery,
+      title: movie.originalTitle,
+    });
+
     movieElement.classList.add("search-section__result-list__item");
     movieElement.setAttribute("tabindex", "-1");
-    movieElement.innerHTML = movie;
+    movieElement.innerHTML = highlightedTitle;
     moviesList.appendChild(movieElement);
+  });
+};
+
+const renderGenreTagsForIds = (idsList) => {
+  idsList.forEach((id) => {
+    const genreElement = document.createElement("span");
+    genreElement.classList.add("genre-tag");
+    genreElement.textContent = getGenreEnum()[id];
+    document.querySelector("#genres").appendChild(genreElement);
   });
 };
 
@@ -87,16 +99,30 @@ const setupArrowNavigationBehavior = () => {
 
 const searchMovies = async (e) => {
   const query = e.target.value;
+
+  window.state.searchQuery = query;
+
+  const fetchedGenres = await fetchMovieGenres(query);
+
+  const genres = fetchedGenres.genres.reduce((acc, { id, name }) => {
+    acc[id] = name;
+    return acc;
+  }, {});
+
+  window.state = {
+    ...window.state,
+    genres,
+  };
+
   const response = await fetchSearchMovies(query);
   const movies = response.results;
-  debugger;
-  const originalNames = mapByOriginalName(movies);
-  const highlightedMovies = highlightSearchedQuery({
-    query,
-    collection: originalNames,
-  });
 
-  fillMovieList(highlightedMovies);
+  window.state = {
+    ...window.state,
+    movies,
+  };
+
+  fillMovieList(movies);
   setupArrowNavigationBehavior();
 };
 

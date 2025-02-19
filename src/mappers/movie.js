@@ -19,18 +19,37 @@
 
 import { fetchMovieGenres } from "@api/request";
 
-// const getGenres = async (ids) => {
-//   return ids.map(async (id) => {
-//     return await getGenreEnum()[id]; // Convert genre ID to name
-//   });
-// };
+const getGenres = (ids) => {
+  return ids.map((id) => {
+    return window.state.genres[id]; // Convert genre ID to name
+  });
+};
+
+const getPosterSrc = (path) => {
+  const baseUrl = "https://image.tmdb.org/t/p/w300";
+
+  return `${baseUrl}${path}`;
+};
+
+const getReleaseYear = (releaseDate) => {
+  const date = new Date("1998-12-31");
+
+  return date.getFullYear();
+};
+
+const getMoviePageUrl = (title) => {
+  return `https://www.imdb.com/title/${title}`;
+};
 
 export const mapMovies = (movies) => {
   return movies.map((movie) => {
     return {
       title: movie.title,
       originalTitle: movie.original_title,
-      // genres: getGenres(movie.genre_ids),
+      genres: getGenres(movie.genre_ids),
+      posterSrc: getPosterSrc(movie.poster_path),
+      releaseYear: getReleaseYear(movie.release_date),
+      moviePageUrl: getMoviePageUrl(movie.title),
     };
   });
 };

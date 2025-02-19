@@ -29,14 +29,44 @@ const fillMovieList = async (movies) => {
 
   mappedMovies.forEach((movie) => {
     const movieElement = document.createElement("li");
+
+    // Handle component props
+    movieElement.classList.add("search-section__results-list__item");
+    movieElement.setAttribute("tabindex", "-1");
+
+    // Handles and highlight the query in title
     const highlightedTitle = highlightSearchedQuery({
       query: window.state.searchQuery,
       title: movie.originalTitle,
     });
 
-    movieElement.classList.add("search-section__result-list__item");
-    movieElement.setAttribute("tabindex", "-1");
     movieElement.innerHTML = highlightedTitle;
+
+    // moviesList.appendChild(movieElement);
+
+    // Create a container for genres
+    const genresContainer = document.createElement("span");
+    genresContainer.classList.add("genres-container");
+
+    // Assuming `movieGenres` is an array of genre IDs for this movie
+    movie.genres.forEach((genre) => {
+      const genreElement = document.createElement("span");
+      genreElement.classList.add("genre-tag");
+      genreElement.textContent = genre; // Convert genre ID to name
+      genresContainer.appendChild(genreElement);
+    });
+
+    // // Append genres to the movie element
+    movieElement.appendChild(genresContainer);
+
+    const imgElement = document.createElement("img");
+    imgElement.dataset.src = movie.posterSrc;
+    imgElement.alt = "Movie Poster";
+    imgElement.loading = "lazy";
+
+    movieElement.appendChild(imgElement);
+
+    // // Append movie element to the list
     moviesList.appendChild(movieElement);
   });
 };
@@ -78,6 +108,12 @@ const setupArrowNavigationBehavior = () => {
   function updateFocus(index) {
     items.forEach((item) => item.classList.remove("focused"));
     items[index].classList.add("focused");
+
+    // Lazy load images
+    items[index].querySelector("img").src =
+      items[index].querySelector("img").dataset.src;
+
+    debugger;
     items[index].focus();
   }
 

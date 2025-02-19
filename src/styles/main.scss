@@ -26,6 +26,7 @@ body {
   }
 
   &__results-list {
+
     width: 480px;
     height: 344px;
     padding: 10px;
@@ -33,9 +34,23 @@ body {
     overflow: auto;
     list-style: none;
 
-    &-item {
+    &__item {
       font-weight: bold;
+      padding: 10px;
+
+      &:not(.focused) {
+
+        img {
+          // display: none !important;
+        }
+        .genres-container {
+          display: none;
+        }
+      }
     }
+
+    // search-section__result-list__item
+    // search-section__results-list__item
 
     .highlight {
       color: #0092FF;
@@ -45,5 +60,20 @@ body {
     .focused {
       background-color: #E1F2FF;
     }
+  }
+
+  .genres-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+
+  }
+
+  .genre-tag {
+    padding: 2px 8px;
+    background-color: #E8E8E8;
+    border: 1px solid #D2D2D2;
+    color: #333333;
+    border-radius: 20px;
   }
 }

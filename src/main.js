@@ -2,10 +2,9 @@ import "./style.css";
 import "./styles/main.scss";
 
 import { fetchSearchMovies, fetchMovieGenres } from "@api/request";
-import {
-  mapByOriginalName,
-  highlightSearchedQuery,
-} from "@utils/dataTransform";
+import { highlightSearchedQuery } from "@utils/dataTransform";
+
+import { toggleFavorite } from "@utils/storage";
 import { mapMovies } from "@mappers/movie";
 
 window.state = {
@@ -35,31 +34,37 @@ const fillMovieList = async (movies) => {
 
     const template = `
       <li
+        id="${movie.id}"
+        data-id="${movie.id}"
         tabindex="-1"
-        class="search-section__item">
+        class="search-section__item ${movie.isFavorite && "favorite"}">
+        <a href="${
+          movie.moviePageUrl
+        }" target="_blank" rel="noopener noreferrer">
 
-        <div class="search-section__col">
-          <img class="search-section__img" data-src="${
-            movie.posterSrc
-          }" alt="Movie Poster" loading="lazy"/>
-        </div>
-
-        <div class="search-section__col">
-          <div>
-            <h6 class="search-section__title">${highlightedTitle}</h6>
-            <date class="search-section__year">(${movie.releaseYear})</date>
+          <div class="search-section__col">
+            <img class="search-section__img" data-src="${
+              movie.posterSrc
+            }" alt="Movie Poster" loading="lazy"/>
           </div>
 
-          <ul class="search-section__tags">
-            ${
-              movie.genres
-                .map((tag) => {
-                  return `<span class="search-section__tag">${tag}</span>`;
-                })
-                .join("") /* avoid commas to be rendered */
-            }
-          </ul>
-        </div>
+          <div class="search-section__col">
+            <div>
+              <h6 class="search-section__title">${highlightedTitle}</h6>
+              <date class="search-section__year">(${movie.releaseYear})</date>
+            </div>
+
+            <ul class="search-section__tags">
+              ${
+                movie.genres
+                  .map((tag) => {
+                    return `<span class="search-section__tag">${tag}</span>`;
+                  })
+                  .join("") /* avoid commas to be rendered */
+              }
+            </ul>
+          </div>
+        </a>
       </li>
     `;
 
@@ -71,17 +76,6 @@ const fillMovieList = async (movies) => {
     moviesList.appendChild(listItemElement);
   });
 };
-
-const renderGenreTagsForIds = (idsList) => {
-  idsList.forEach((id) => {
-    const genreElement = document.createElement("span");
-    genreElement.classList.add("genre-tag");
-    genreElement.textContent = getGenreEnum()[id];
-    document.querySelector("#genres").appendChild(genreElement);
-  });
-};
-
-// searchMovies("matrix");
 
 document.querySelector("#app").innerHTML = `
   <section class='search-section'>
@@ -97,7 +91,8 @@ document.querySelector("#app").innerHTML = `
 
 const setupSearch = () => {
   const searchInput = document.querySelector("#search");
-  searchInput.addEventListener("blur", searchMovies);
+  searchInput.addEventListener("input", searchMovies);
+  document.addEventListener("keydown", handleFavorite);
 };
 
 const setupArrowNavigationBehavior = () => {
@@ -106,7 +101,7 @@ const setupArrowNavigationBehavior = () => {
 
   let currentIndex = 0;
 
-  function updateFocus(index) {
+  const updateFocus = (index) => {
     items.forEach((item) => item.classList.remove("focused"));
     items[index].classList.add("focused");
 
@@ -116,7 +111,12 @@ const setupArrowNavigationBehavior = () => {
 
     debugger;
     items[index].focus();
-  }
+
+    window.state = {
+      ...window.state,
+      currentMovieId: items[index].dataset.id,
+    };
+  };
 
   list.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown") {
@@ -134,33 +134,49 @@ const setupArrowNavigationBehavior = () => {
   updateFocus(currentIndex);
 };
 
+let inputTimeout;
+
 const searchMovies = async (e) => {
-  const query = e.target.value;
+  clearTimeout(inputTimeout);
 
-  window.state.searchQuery = query;
+  inputTimeout = setTimeout(async () => {
+    const query = e.target.value;
+    window.state.searchQuery = query;
 
-  const fetchedGenres = await fetchMovieGenres(query);
+    const fetchedGenres = await fetchMovieGenres(query);
 
-  const genres = fetchedGenres.genres.reduce((acc, { id, name }) => {
-    acc[id] = name;
-    return acc;
-  }, {});
+    const genres = fetchedGenres.genres.reduce((acc, { id, name }) => {
+      acc[id] = name;
+      return acc;
+    }, {});
 
-  window.state = {
-    ...window.state,
-    genres,
-  };
+    window.state = {
+      ...window.state,
+      genres,
+    };
 
-  const response = await fetchSearchMovies(query);
-  const movies = response.results;
+    const response = await fetchSearchMovies(query);
+    const movies = response.results;
 
-  window.state = {
-    ...window.state,
-    movies,
-  };
+    window.state = {
+      ...window.state,
+      movies,
+    };
 
-  fillMovieList(movies);
-  setupArrowNavigationBehavior();
+    fillMovieList(movies);
+    setupArrowNavigationBehavior();
+  }, 300);
+};
+
+const handleFavorite = (e) => {
+  if (e.code !== "Space") return;
+  if (!window.state.currentMovieId) return;
+  e.preventDefault();
+
+  const movieId = window.state.currentMovieId;
+  toggleFavorite(movieId);
+
+  document.getElementById(movieId).classList.toggle("favorite");
 };
 
 setupSearch();

@@ -17,7 +17,7 @@
   }
 */
 
-import { fetchMovieGenres } from "@api/request";
+import { isMovieFavorite } from "@utils/storage";
 
 const getGenres = (ids) => {
   return ids.map((id) => {
@@ -37,19 +37,25 @@ const getReleaseYear = (releaseDate) => {
   return date.getFullYear();
 };
 
-const getMoviePageUrl = (title) => {
-  return `https://www.imdb.com/title/${title}`;
+const getMoviePageUrl = (movie) => {
+  const baseUrl = "https://www.themoviedb.org/movie";
+  return `${baseUrl}/${movie.id}`;
+
+  // https://www.themoviedb.org/tv/555879-matrix
+  // https://www.themoviedb.org/movie/603-the-matrix
 };
 
 export const mapMovies = (movies) => {
   return movies.map((movie) => {
     return {
+      id: movie.id,
       title: movie.title,
       originalTitle: movie.original_title,
       genres: getGenres(movie.genre_ids),
       posterSrc: getPosterSrc(movie.poster_path),
       releaseYear: getReleaseYear(movie.release_date),
-      moviePageUrl: getMoviePageUrl(movie.title),
+      moviePageUrl: getMoviePageUrl(movie),
+      isFavorite: isMovieFavorite(movie.id),
     };
   });
 };

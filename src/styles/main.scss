@@ -38,6 +38,8 @@ body {
   &__col {
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    flex-grow: 0;
 
     > div {
       display: flex;
@@ -72,12 +74,32 @@ body {
 
   &__item {
     display: flex;
-    gap: 10px;
     font-weight: bold;
     padding: 10px;
 
+    &.favorite {
+      position: relative;
+
+      &:before {
+        content: "⭐";
+        position: absolute;
+        right: 10px;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    > a {
+      gap: 10px;
+      display: flex;
+      overflow: hidden;
+    }
+
     &:not(.focused) {
-      .search-section__img, .search-section__tags{
+      .search-section__img, .search-section__tags {
         display: none;
       }
     }
@@ -106,6 +128,7 @@ body {
     display: flex;
     gap: 10px;
     margin-top: 10px;
+    overflow: auto !important;
   }
 
   &__tag {
@@ -117,5 +140,6 @@ body {
     font-size: 12px;
     line-height: 16px;
     font-weight: 600;
+    white-space: nowrap;
   }
 }

@@ -14,6 +14,7 @@ Decidi não utilizar frameworks como Vue.js ou React para ter maior liberdade na
 
 Para garantir organização e separação clara de responsabilidades, defini a seguinte estrutura de pastas:
 
+```
 📂 src
 ┃ ┣ 📂api
 ┃ ┣ 📂components
@@ -21,6 +22,7 @@ Para garantir organização e separação clara de responsabilidades, defini a s
 ┃ ┣ 📂styles
 ┃ ┣ 📂utils
 📂 tests
+```
 
 ## Requerimentos
 

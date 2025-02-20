@@ -76,6 +76,7 @@ Runs unit tests using Vitest.
 📁 Project Structure
 The project is structured as follows:
 
+```
 📦 my-vue-app
 ┣ 📂src
 ┃ ┣ 📂api
@@ -92,6 +93,7 @@ The project is structured as follows:
 ┣ 📜package.json
 ┣ 📜vite.config.js
 ┗ 📜yarn.lock
+```
 
 ### Notes
 

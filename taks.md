@@ -5,9 +5,8 @@
 - [x] Render movie, title, year and poster
 - [x] Application must be responsive
 - [x] Click on a movie should lead to IMDB movie page
-- [ ] Results should use pagination
 - [x] Case insensitive search should work properly
-- [ ] Handle error case with suggestions
+- [x] Handle error case with suggestions
 - [x] Favorite/Unfavorite movie should be possible
 - [x] Favorite/Unfavorite movie should be possible pressing space key
 - [x] Favorites should be saved locally

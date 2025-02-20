@@ -4,9 +4,10 @@ import path from "path";
 export default defineConfig({
   resolve: {
     alias: {
-      "@api": path.resolve(__dirname, "src/api"), // Alias '@api' -> '/src/api'
+      "@api": path.resolve(__dirname, "src/api"),
       "@utils": path.resolve(__dirname, "src/utils"),
       "@mappers": path.resolve(__dirname, "src/mappers"),
+      "@components": path.resolve(__dirname, "src/components"),
     },
   },
 });

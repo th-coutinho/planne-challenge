@@ -28,8 +28,7 @@ body {
   flex-direction: column;
   justify-content: flex-start;
   text-align: left;
-  max-width: 480px;
-  width: 100%;
+  width: 480px;
 
   @media screen and (max-width: 768px) {
     width: 300px;
@@ -45,6 +44,11 @@ body {
   &__hint {
     margin: 4px 0;
     color: $color-gray-soft;
+    font-size: $font-size-medium;
+    line-height: $line-height-medium;
+  }
+
+  &__error {
     font-size: $font-size-medium;
     line-height: $line-height-medium;
   }

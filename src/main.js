@@ -2,73 +2,45 @@ import "./style.css";
 import "./styles/main.scss";
 
 import { fetchSearchMovies, fetchMovieGenres } from "@api/request";
-import { highlightSearchedQuery } from "@utils/dataTransform";
 
 import { toggleFavorite } from "@utils/storage";
 import { mapMovies } from "@mappers/movie";
+
+import ListItem from "@components/ListItem";
+import ErrorMessage from "@components/ErrorMessage";
+
+/*
+  TODO: Implement a better way to control the state
+  something like an event based singleton class
+*/
 
 window.state = {
   searchQuery: "",
   movies: [],
   genres: [],
-  currentPage: 1,
-  totalPages: 1,
 };
 
-/*
-  Why Use tabindex?
-  tabindex="0" → Makes the element focusable in natural tab order.
-  tabindex="-1" → Makes it focusable programmatically (not via keyboard Tab).
-*/
-
 const fillMovieList = async (movies) => {
+  const query = window.state.searchQuery;
+
   const moviesList = document.querySelector("#movies");
   moviesList.innerHTML = "";
   const mappedMovies = mapMovies(movies);
 
-  mappedMovies.forEach((movie) => {
-    const highlightedTitle = highlightSearchedQuery({
-      query: window.state.searchQuery,
-      title: movie.originalTitle,
-    });
-
-    const template = `
-      <li
-        id="${movie.id}"
-        data-id="${movie.id}"
-        tabindex="-1"
-        class="search-section__item ${movie.isFavorite && "favorite"}">
-        <a href="${
-          movie.moviePageUrl
-        }" target="_blank" rel="noopener noreferrer">
-
-          <div class="search-section__col">
-            <img class="search-section__img" data-src="${
-              movie.posterSrc
-            }" alt="Movie Poster" loading="lazy"/>
-          </div>
-
-          <div class="search-section__col">
-            <div>
-              <h6 class="search-section__title">${highlightedTitle}</h6>
-              <date class="search-section__year">(${movie.releaseYear})</date>
-            </div>
-
-            <ul class="search-section__tags">
-              ${
-                movie.genres
-                  .map((tag) => {
-                    return `<span class="search-section__tag">${tag}</span>`;
-                  })
-                  .join("") /* avoid commas to be rendered */
-              }
-            </ul>
-          </div>
-        </a>
-      </li>
-    `;
+  if (mappedMovies.length === 0) {
+    const template = ErrorMessage({ query });
 
     // Convert string into real DOM nodes
+    const listItemElement = document
+      .createRange()
+      .createContextualFragment(template);
+
+    moviesList.appendChild(listItemElement);
+  }
+
+  mappedMovies.forEach((movie) => {
+    const template = ListItem({ movie, query });
+
     const listItemElement = document
       .createRange()
       .createContextualFragment(template);
@@ -182,4 +154,10 @@ const handleFavorite = (e) => {
   document.getElementById(movieId).classList.toggle("favorite");
 };
 
-setupSearch();
+try {
+  setupSearch();
+} catch (error) {
+  // TODO: Capture the error and send to some service as AppSignal
+  // TODO: Show a friendly error message to the user
+  alert("An error occurred, try again later");
+}
